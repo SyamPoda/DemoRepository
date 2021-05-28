@@ -6,25 +6,69 @@ namespace BankAccount.Account
 {
     public class CustomerAccount
     {
-        public int AccountNumber { get; set; }
-        public string Owner { get; set; }      
-                
+        private int accountNumber;
+        private string owner;
+        private decimal balance = 100;
         public void CustomerDetails(string name,int accountNumber)
         {
-            this.Owner = name;            
-            this.AccountNumber = accountNumber;
-            accountNumber++;
+            this.owner = name;            
+            this.accountNumber = accountNumber;
+            //accountNumber++;
+        }
+        private List<Transactions> allTransactions = new List<Transactions>();
+        public int AccountNumber
+        {
+            get
+            {
+                return accountNumber;
+            }
+
+            set
+            {
+
+                if (value > 0)
+                {
+                    this.accountNumber = value;
+                }
+
+                else
+                {
+
+                    throw new ArgumentOutOfRangeException("Invalid account number");
+
+                }
+            }
         }
 
-        private decimal balance = 1000;
+        public string Owner
+        {
+            get
+            {
+                return owner;
+            }
+
+            set
+            {                               
+                    this.owner = value;
+                }
+
+               
+            }
+
         public decimal Balance
         {
             get
             {
+                foreach (var item in allTransactions)
+                {
+                    balance += item.Amount;
+                }
+
                 return balance;
             }
 
-            set { 
+            set
+            {
 
                 if (value > 0)
                 {
@@ -35,15 +79,33 @@ namespace BankAccount.Account
                 {
 
                     throw new ArgumentOutOfRangeException("Account balance is 0");
-                
+
                 }
             }
         }
-        public void WithDraw(decimal amount)
+
+        public void Deposit(decimal amount, DateTime date)
+        {
+
+            if (amount > 0)
+            {
+
+                var deposit = new Transactions(amount, date);
+                allTransactions.Add(deposit);
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException("Amount of deposit must be positive");
+            }
+        }
+
+
+        public void WithDraw(decimal amount, DateTime date)
         {
             if (amount < balance)
             {
-                balance = balance - amount;
+                var withdrawal = new Transactions(balance-amount, date);
+                allTransactions.Add(withdrawal);
             }
             else
             {
@@ -51,18 +113,12 @@ namespace BankAccount.Account
             }
         }
 
-        public void Deposit(decimal amount)
-        {
-            if (amount > 0)
-            {
-                balance = balance + amount;
-            }
-            else 
-            {
-                throw new ArgumentOutOfRangeException("Negative value is not allowed");
-            }
-        }
+        
 
+
+
+    }      
+       
 
     }
-}
+
